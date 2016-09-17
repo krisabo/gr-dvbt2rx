@@ -27,6 +27,7 @@
 
 #include "qa_dvbt2rx.h"
 
+
 CppUnit::TestSuite *
 qa_dvbt2rx::suite()
 {

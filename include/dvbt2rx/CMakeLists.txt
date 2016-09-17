@@ -22,5 +22,5 @@
 ########################################################################
 install(FILES
     api.h
-    DESTINATION include/dvbt2rx
+    p1_demod.h DESTINATION include/dvbt2rx
 )

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<block>
+  <name>p1_demod</name>
+  <key>dvbt2rx_p1_demod</key>
+  <category>[dvbt2rx]</category>
+  <import>import dvbt2rx</import>
+  <make>dvbt2rx.p1_demod()</make>
+
+  <sink>
+    <name>in</name>
+    <type>byte</type>
+  </sink>
+    
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+    
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+
+  <source>
+    <name>out</name>
+    <type>complex</type>
+  </source>
+</block>

@@ -24,9 +24,8 @@ include(GrPlatform) #define LIB_SUFFIX
 
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
-
 list(APPEND dvbt2rx_sources
-)
+    p1_demod_impl.cc )
 
 set(dvbt2rx_sources "${dvbt2rx_sources}" PARENT_SCOPE)
 if(NOT dvbt2rx_sources)
