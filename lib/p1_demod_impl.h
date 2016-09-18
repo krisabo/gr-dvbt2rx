@@ -34,6 +34,12 @@ namespace gr {
      private:
     	const static int fft_len = 1024;
     	const static int cnt_act_carriers = 384;
+    	const static int s1_bit_length = 64;
+    	const static int s2_bit_length = 256;
+    	const static int s1_pattern = 8;
+    	const static int s2_pattern = 16;
+
+
 
         gr_complex *d_in_fftw;
         gr_complex *d_out_fftw;
@@ -41,15 +47,23 @@ namespace gr {
 
         float *d_vec_tmp1_f;
         float *d_vec_tmp0_f;
-//        float *d_energy_distribution;
 
+        int p1_scramble_seq[384];
 
         const static int p1_active_carriers[384];
         const static unsigned char s1_modulation_patterns[8][8];
         const static unsigned char s2_modulation_patterns[16][32];
 
+
+        void init_p1_scramble_seq();
+
         bool cds_correlation(int* ifo,const gr_complex* p1_freq_domain);
-        //static int void demod_p1();
+        bool demod(int* s1, int* s2, const gr_complex* in);
+
+        void correct_ffo(float ffo, gr_complex* out, const gr_complex* in);
+        void correct_ifo(int ifo, gr_complex* out, const gr_complex* in);
+        void max_and_second_max(float* max, int* max_index, float* sec_max, int* sec_max_index, float* arr, int points);
+
 
      public:
       p1_demod_impl();

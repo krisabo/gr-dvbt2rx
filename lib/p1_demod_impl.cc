@@ -56,13 +56,8 @@ namespace gr {
         int alig = volk_get_alignment();
         d_vec_tmp1_f = (float*) volk_malloc(2 * fft_len * sizeof(float), alig);
         d_vec_tmp0_f = (float*) volk_malloc(2 * fft_len * sizeof(float), alig);
-//        d_energy_distribution = (float*) volk_malloc(fft_len * sizeof(float), alig);
-//
-//        //build energy distribution vector
-//        memset(d_energy_distribution, 0, fft_len*sizeof(d_energy_distribution[0]));
-//        for(int i=0; i<cnt_act_carriers; i++){
-//        	d_energy_distribution[p1_active_carriers[i]] = 1;
-//        }
+
+        init_p1_scramble_seq();
 
     }
 
@@ -97,21 +92,25 @@ namespace gr {
 
     			//correct fractional frequency offset
     			float ffo = std::arg(in_phase[i]);
-    			gr_complex phase_inc = std::polar(1.0F, -1.0F/fft_len*ffo);
-    			volk_32fc_s32fc_rotatorpuppet_32fc(d_in_fftw, in_data+i, phase_inc, fft_len);
+    			correct_ffo(ffo, d_in_fftw, in_data+i);
 
     			//to freq domain
     			fftwf_execute(d_fftw_plan);
 
     			int ifo;
-    			cds_correlation(&ifo, d_out_fftw);
+    			if(cds_correlation(&ifo, d_out_fftw)){
+        			correct_ifo(ifo, d_in_fftw, d_out_fftw);
 
-    			printf("cfo = ifo(%i) + ffo(%f) = %f\n", ifo, ffo/3.141/2, ifo+ffo);
+        			int s1, s2;
+        			demod(&s1, &s2, d_in_fftw);
+
+        			printf("Detected P1 Pilot: cfo = ifo(%i) + ffo(%f) = %f\n", ifo, ffo/3.141/2, ifo+ffo/3.141/2);
+        			add_item_tag(0,nitems_written(0)+i, pmt::mp("p1_start"), pmt::mp("change_me"));
+
+    			}
 
     			//s=demod(in_data+i, ffo)
 
-
-    			add_item_tag(0,nitems_written(0)+i, pmt::mp("p1_start"), pmt::mp("change_me"));
 
     		}
     	}
@@ -120,12 +119,177 @@ namespace gr {
     }
 
     /*
-     * Estimates the position of the correlation peak. Correlation is done with the energy
-     * distribution of the carriers and the energy/abs of the p1 in freq domain.
+     * Demods the P1 Symbol.
      *
-     * This is also an estimation of the carrier integer frequency offset.
+     * Takes a 1024 input vector and demods the S1, S2 values.
      *
-     * Returns true if a peak was found, false if the p1 signal is not detected
+     * Returns true if successful.
+     *
+     */
+    bool p1_demod_impl::demod(int* s1, int* s2, const gr_complex* in){
+
+    	//TODO: use volk for speed opt.
+
+       	gr_complex symbols_fftshift[fft_len];
+    	gr_complex symbols[cnt_act_carriers];
+    	gr_complex dbpsk_demod[cnt_act_carriers];
+       	float s1_soft_bits [s1_bit_length];
+       	float s2_soft_bits [s2_bit_length];
+
+       	float s1_corr_results[s1_pattern];
+       	float s2_corr_results[s2_pattern];
+
+
+    	//fftshift
+    	memcpy(symbols_fftshift, in+fft_len/2, fft_len/2*sizeof(in[0]));
+    	memcpy(symbols_fftshift+fft_len/2, in, fft_len/2*sizeof(in[0]));
+
+
+    	//demap
+    	for(int i=0; i<cnt_act_carriers; i++){
+    		symbols[i] = symbols_fftshift[p1_active_carriers[i] + 86];
+    	}
+
+    	//descramble
+    	for(int i=0; i<cnt_act_carriers; i++){
+    		symbols[i] *= p1_scramble_seq[i];
+    	}
+
+    	//DBPSK soft demod
+    	//note: S1 and S2 sequence always starts with a 0 bit, so initial DBPSK symbol is defined
+    	dbpsk_demod[0] = gr_complex(1,0);
+    	for(int i=1; i<cnt_act_carriers; i++){
+    		dbpsk_demod[i] = (symbols[i-1] * std::conj(symbols[i]));
+    	}
+
+    	//add the double sent part of the s1 symbol to improve reception
+    	for(int i=0; i<s1_bit_length; i++){
+    		dbpsk_demod[i] += dbpsk_demod[i+s1_bit_length+s2_bit_length];
+    	}
+
+    	// see 10.2.2.7.3 of implementation guide -> ? what are they doing ?
+    	// using a other decoding scheme
+
+    	//demod to soft bits
+    	for(int i=0; i<s1_bit_length; i++){
+    		s1_soft_bits[i] += std::real(dbpsk_demod[i]);
+    	}
+    	for(int i=0; i<s2_bit_length; i++){
+    		s2_soft_bits[i] += std::real(dbpsk_demod[i+s1_bit_length]);
+    	}
+
+    	//correlate s1 with the original known pattern
+    	for(int i=0; i<s1_pattern; i++){
+    		s1_corr_results[i] = 0;
+    		for(int b=0; b<s1_bit_length; b++){
+    			unsigned char bit =  (s1_modulation_patterns[i][b/8]  >> (7-b%8) & 1);
+    			if(bit){
+    				s1_corr_results[i] -= s1_soft_bits[b];
+    			}else{
+    				s1_corr_results[i] += s1_soft_bits[b];
+    			}
+
+    		}
+    	}
+
+    	//correlate s2 with the original known pattern
+    	for(int i=0; i<s2_pattern; i++){
+    		s2_corr_results[i] = 0;
+    		for(int b=0; b<s2_bit_length; b++){
+    			unsigned char bit =  (s2_modulation_patterns[i][b/8]  >> (7-b%8) & 1);
+    			if(bit){
+    				s2_corr_results[i] -= s2_soft_bits[b];
+    			}else{
+    				s2_corr_results[i] += s2_soft_bits[b];
+    			}
+
+    		}
+    	}
+
+    	//look for max peaks
+    	float max=0, second_max=0;
+    	int max_index = 0, second_max_index=0;
+
+    	max_and_second_max(&max, &max_index, &second_max, &second_max_index, s1_corr_results, s1_pattern);
+    	if(max > 5 * second_max){
+    		*s1 = max_index;
+    	}else{
+    		return false;
+    	}
+
+    	max_and_second_max(&max, &max_index, &second_max, &second_max_index, s2_corr_results, s2_pattern);
+      	if(max > 5 * second_max){
+        	*s2 = max_index;
+        }else{
+        	return false;
+        }
+
+      	printf("s1: %i, s2: %i \n", *s1, *s2);
+
+    	return true;
+
+    }
+
+    /*
+     * Searches for the max and second max element in arr, where points > 2 are the number elements
+     */
+    void p1_demod_impl::max_and_second_max(float* max, int* max_index, float* sec_max, int* sec_max_index, float* arr, int points){
+    	//TODO: faster with volk?
+
+    	if(arr[0]>arr[1]){
+        	*max = arr[0];
+    		*max_index=0;
+        	*sec_max = arr[1];
+    		*sec_max_index=1;
+    	}else{
+        	*max = arr[1];
+    		*max_index=1;
+        	*sec_max = arr[0];
+    		*sec_max_index=0;
+    	}
+
+    	for(int i=2; i<points; i++){
+    		if(arr[i]>*max){
+    			*sec_max = *max;
+    			*sec_max_index = *max_index;
+    			*max=arr[i];
+    			*max_index=i;
+    		}
+    	}
+
+    }
+
+
+
+    /*
+     * copied from gr-dvbt2
+     */
+    void p1_demod_impl::init_p1_scramble_seq()
+    {
+        int sr = 0x4e46;
+        for (int i = 0; i < 384; i++)
+        {
+            int b = ((sr) ^ (sr >> 1)) & 1;
+            if (b == 0)
+            {
+            	p1_scramble_seq[i] = 1;
+            }
+            else
+            {
+            	p1_scramble_seq[i] = -1;
+            }
+            sr >>= 1;
+            if(b) sr |= 0x4000;
+        }
+    }
+
+
+    /*
+     * Estimates the position of the correlation peak in frequency domain and therefore the IFO.
+     * Correlation is done with the energy distribution of the carriers and
+     * the energy/abs of the p1 in freq domain.
+     *
+     * Returns true if a peak was found, false if the p1 signal is not detected.
      */
     bool p1_demod_impl::cds_correlation(int* ifo, const gr_complex* p1_freq_domain){
 
@@ -143,7 +307,7 @@ namespace gr {
     	// Algorithm: punish when there is energy at frequencies where it shouldnt
     	// and delete high CW interferer (see implementation guide)
 		// 1. calculate mean and stddev
-		// 2. look for values above mean + 3*stddev, TODO: value=3?
+		// 2. look for values above mean + 5*stddev, TODO: value=5?
 		// 3. clip these values
 		// 4. calculate new mean
 		// 5. subtract that mean
@@ -210,6 +374,29 @@ namespace gr {
     		return true;
     	}
     	return false;
+    }
+
+
+
+    void p1_demod_impl::correct_ffo(float ffo, gr_complex* out, const gr_complex* in){
+		gr_complex phase_inc = std::polar(1.0F, -1.0F/fft_len*ffo);
+		volk_32fc_s32fc_rotatorpuppet_32fc(out, in, phase_inc, fft_len);
+    }
+
+
+    void p1_demod_impl::correct_ifo(int ifo, gr_complex* out, const gr_complex* in){
+    	if(ifo==0)
+    		memcpy(out, in, fft_len*sizeof(out[0]));
+
+    	if(ifo>=0){
+    		memcpy(out, in+ifo, (fft_len-ifo)*sizeof(out[0]));
+    		memset(out+fft_len-ifo, 0, ifo*sizeof(out[0]) );
+    	}
+    	else{
+    		memcpy(out-ifo, in, (fft_len+ifo)*sizeof(out[0]));
+    		memset(out, 0, -ifo*sizeof(out[0]) );
+
+    	}
     }
 
 
@@ -295,4 +482,5 @@ namespace gr {
 
   } /* namespace dvbt2rx */
 } /* namespace gr */
+
 
