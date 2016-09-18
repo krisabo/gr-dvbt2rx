@@ -34,7 +34,7 @@ if(NOT dvbt2rx_sources)
 endif(NOT dvbt2rx_sources)
 
 add_library(gnuradio-dvbt2rx SHARED ${dvbt2rx_sources})
-target_link_libraries(gnuradio-dvbt2rx ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
+target_link_libraries(gnuradio-dvbt2rx ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES} ${FFTW3F_LIBRARIES})
 set_target_properties(gnuradio-dvbt2rx PROPERTIES DEFINE_SYMBOL "gnuradio_dvbt2rx_EXPORTS")
 
 if(APPLE)

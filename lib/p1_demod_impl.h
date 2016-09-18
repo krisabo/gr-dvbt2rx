@@ -22,6 +22,9 @@
 #define INCLUDED_DVBT2RX_P1_DEMOD_IMPL_H
 
 #include <dvbt2rx/p1_demod.h>
+#include <volk/volk.h>
+#include <fftw3.h>
+#include <cmath>
 
 namespace gr {
   namespace dvbt2rx {
@@ -29,10 +32,23 @@ namespace gr {
     class p1_demod_impl : public p1_demod
     {
      private:
+    	const static int fft_len = 1024;
+    	const static int cnt_act_carriers = 384;
+
+        gr_complex *d_in_fftw;
+        gr_complex *d_out_fftw;
+        fftwf_plan d_fftw_plan;
+
+        float *d_vec_tmp1_f;
+        float *d_vec_tmp0_f;
+//        float *d_energy_distribution;
+
+
         const static int p1_active_carriers[384];
         const static unsigned char s1_modulation_patterns[8][8];
         const static unsigned char s2_modulation_patterns[16][32];
 
+        bool cds_correlation(int* cfo,const gr_complex* p1_freq_domain);
         //static int void demod_p1();
 
      public:

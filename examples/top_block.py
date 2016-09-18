@@ -3,7 +3,7 @@
 ##################################################
 # GNU Radio Python Flow Graph
 # Title: Top Block
-# Generated: Sun Sep 18 00:52:25 2016
+# Generated: Sun Sep 18 18:24:54 2016
 ##################################################
 
 if __name__ == '__main__':
@@ -121,7 +121,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.blocks_multiply_xx_0 = blocks.multiply_vcc(1)
         self.blocks_file_source_0_0 = blocks.file_source(gr.sizeof_gr_complex*1, '/home/maier/workspace/gr-dvbt2rx/binary/signal.bin', True)
         self.blocks_add_xx_0 = blocks.add_vcc(1)
-        self.analog_sig_source_x_1 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, samp_rate/1024*0., 1, 0)
+        self.analog_sig_source_x_1 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, samp_rate/1024*0, 1, 0)
         self.analog_fastnoise_source_x_0 = analog.fastnoise_source_c(analog.GR_GAUSSIAN, 0.0, 11, 819207)
 
         ##################################################
@@ -147,7 +147,7 @@ class top_block(gr.top_block, Qt.QWidget):
         self.samp_rate = samp_rate
         self.blocks_throttle_0_0.set_sample_rate(self.samp_rate)
         self.analog_sig_source_x_1.set_sampling_freq(self.samp_rate)
-        self.analog_sig_source_x_1.set_frequency(self.samp_rate/1024*0.)
+        self.analog_sig_source_x_1.set_frequency(self.samp_rate/1024*0)
 
 
 def main(top_block_cls=top_block, options=None):

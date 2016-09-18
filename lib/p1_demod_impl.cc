@@ -43,7 +43,27 @@ namespace gr {
               gr::io_signature::make3(3, 3, sizeof(char),sizeof(gr_complex),sizeof(gr_complex)),
               gr::io_signature::make(1, 1, sizeof(gr_complex)))
     {
-    	set_history(1024+542);
+    	//make sure that enough samples are in the buffer
+    	set_history(fft_len);
+
+    	//initialize FFT
+        d_in_fftw = (gr_complex*) fftwf_malloc(fft_len * sizeof(fftwf_complex));
+        d_out_fftw = (gr_complex*) fftwf_malloc(fft_len * sizeof(fftwf_complex));
+        d_fftw_plan = fftwf_plan_dft_1d(fft_len, reinterpret_cast<fftwf_complex*>(d_in_fftw),
+                				reinterpret_cast<fftwf_complex*> (d_out_fftw), FFTW_FORWARD, FFTW_ESTIMATE);
+
+        //variable used by volk
+        int alig = volk_get_alignment();
+        d_vec_tmp1_f = (float*) volk_malloc(2 * fft_len * sizeof(float), alig);
+        d_vec_tmp0_f = (float*) volk_malloc(2 * fft_len * sizeof(float), alig);
+//        d_energy_distribution = (float*) volk_malloc(fft_len * sizeof(float), alig);
+//
+//        //build energy distribution vector
+//        memset(d_energy_distribution, 0, fft_len*sizeof(d_energy_distribution[0]));
+//        for(int i=0; i<cnt_act_carriers; i++){
+//        	d_energy_distribution[p1_active_carriers[i]] = 1;
+//        }
+
     }
 
     /*
@@ -51,6 +71,11 @@ namespace gr {
      */
     p1_demod_impl::~p1_demod_impl()
     {
+        fftwf_destroy_plan(d_fftw_plan);
+        fftwf_free(d_in_fftw);
+        fftwf_free(d_out_fftw);
+        volk_free(d_vec_tmp1_f);
+        volk_free(d_vec_tmp0_f);
     }
 
     int
@@ -67,9 +92,30 @@ namespace gr {
 
     	for(int i=0; i<noutput_items; i++){
     		if(in_sync[i]){
+
+    			//correct fractional frequency offset
     			float ffo = std::arg(in_phase[i]);
+    			gr_complex phase_inc = std::polar(1.0F, -1.0F/fft_len*ffo);
+    			volk_32fc_s32fc_rotatorpuppet_32fc(d_in_fftw, in_data+i, phase_inc, fft_len);
+
+//    	    	for(int j=0; j<fft_len; j++)
+//    	    		printf("freq[%i] = %f+j%f\n", j, std::real(*(d_in_fftw+j)),std::imag(*(d_in_fftw+j)));
+
+    			//to freq domain
+    			fftwf_execute(d_fftw_plan);
+
+//    	    	for(int i=0; i<fft_len; i++)
+//    	    		printf("freq[%i] = %f\n", i, *(d_vec_tmp1+i));
+
+    			int cfo;
+    			cds_correlation(&cfo, d_out_fftw);
+
+    			printf("fo = cfo(%i) + ffo(%f) = %f\n", cfo, ffo/3.141/2, cfo+ffo);
+
     			//s=demod(in_data+i, ffo)
-    			add_item_tag(0,nitems_written(0)+i, pmt::mp("p1_start"), pmt::mp("changeme"));
+
+
+    			add_item_tag(0,nitems_written(0)+i, pmt::mp("p1_start"), pmt::mp("change_me"));
 
     		}
     	}
@@ -77,9 +123,100 @@ namespace gr {
       return noutput_items;
     }
 
+    /*
+     * Estimates the position of the correlation peak. Correlation is done with the energy
+     * distribution of the carriers and the energy/abs of the p1 in freq domain.
+     *
+     * This is a estimation of the carrier freq offset.
+     *
+     * returns true if a peak was found
+     */
+    bool p1_demod_impl::cds_correlation(int* cfo, const gr_complex* p1_freq_domain){
+
+    	// energy in rx symbol
+    	// d_vec_tmp1 = abs(p1_freq_domain)^2
+    	volk_32fc_magnitude_squared_32f(d_vec_tmp1_f, p1_freq_domain, fft_len);
+
+    	// Algorithm to punish when there is energy at frequency where it shouldnt
+    	//	and to delete very high CW interferer (see implementation guide)
+		// 1. calculate mean and stddev
+		// 2. look for values above mean + 4*stddev, TODO: value=4?
+		// 3. clip these values
+		// 4. calculate new mean
+		// 5. subtract that mean
+
+    	float mean = 0;
+    	float stddev = 0;
+    	volk_32f_stddev_and_mean_32f_x2(&stddev, &mean, d_vec_tmp1_f, fft_len);
+    	for(int i=0; i<fft_len; i++){
+    		if(d_vec_tmp1_f[i] > mean + 4 * stddev){
+    			d_vec_tmp1_f[i] = mean + 2 * stddev;
+    			printf("strong interferer detected at freq: %i", i-fft_len/2);
+    		}
+    	}
+
+    	volk_32f_accumulator_s32f(&mean, d_vec_tmp1_f, fft_len);
+    	mean = mean/fft_len;
+		for(int i=0; i<fft_len; i++){
+			d_vec_tmp1_f[i] -= mean;
+		}
+
+    	//printf("mean = %f, stddev = %f\n", mean, stddev);
+
+    	//fftshift
+    	//d_vec_tmp0 = [d_vec_tmp1[512:1023], d_vec_tmp1[0:511]]
+    	memcpy(d_vec_tmp0_f, d_vec_tmp1_f+fft_len/2, fft_len/2 * sizeof(d_vec_tmp0_f[0]));
+    	memcpy(d_vec_tmp0_f+fft_len/2, d_vec_tmp1_f, fft_len/2 * sizeof(d_vec_tmp0_f[0]));
+
+    	//d_vec_tmp1 = 0
+    	memset(d_vec_tmp1_f, 0, fft_len*sizeof(float));
+
+    	//not all the range from -1024 to 1024 is used
+    	//from i=-512 to 511 correlation
+    	for(int i=0; i<fft_len; i++){
+    		//iterate over active carriers
+    		for(int k=0; k<cnt_act_carriers; k++){
+    			int carrier = p1_active_carriers[k]+i+86-fft_len/2;	//86 because of offset (see standard)
+
+    			if(carrier > 0 && carrier < fft_len)
+    				d_vec_tmp1_f[i] += d_vec_tmp0_f[carrier];
+    		}
+//		if(i>500 && i<520)
+//			printf("corr[%i] = %f\n", i-fft_len/2, *(d_vec_tmp1_f+i));
+    	}
+
+    	//detect max peak
+    	unsigned int max_index;
+    	float max;
+    	volk_32f_index_max_32u(&max_index, d_vec_tmp1_f, fft_len);
+    	max = d_vec_tmp1_f[max_index];
+    	d_vec_tmp1_f[max_index] = -3.4028e+38;
+
+    	//detect second max peak
+    	unsigned int second_max_index;
+    	float second_max;
+    	volk_32f_index_max_32u(&second_max_index, d_vec_tmp1_f, fft_len);
+    	second_max = d_vec_tmp1_f[second_max_index];
+
+    	//printf("max_index: %i, secondmax_index: %i\n", max_index, second_max_index);
+
+    	printf("max: %f, secondmax: %f\n", max, second_max);
+
+    	//calculat cfo
+    	*cfo = max_index-fft_len/2;
+
+    	//TODO: value
+    	if(max > 2*second_max){
+    		printf("true\n");
+    		return true;
+    	}
+		printf("false\n");
+    	return false;
+    }
 
 
-    const int p1_demod_impl::p1_active_carriers[384] =
+
+    const int p1_demod_impl::p1_active_carriers[cnt_act_carriers] =
     {
         44, 45, 47, 51, 54, 59, 62, 64, 65, 66, 70, 75, 78, 80, 81, 82, 84, 85, 87, 88, 89, 90,
         94, 96, 97, 98, 102, 107, 110, 112, 113, 114, 116, 117, 119, 120, 121, 122, 124,
