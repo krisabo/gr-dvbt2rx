@@ -48,7 +48,7 @@ namespace gr {
         const static unsigned char s1_modulation_patterns[8][8];
         const static unsigned char s2_modulation_patterns[16][32];
 
-        bool cds_correlation(int* cfo,const gr_complex* p1_freq_domain);
+        bool cds_correlation(int* ifo,const gr_complex* p1_freq_domain);
         //static int void demod_p1();
 
      public:

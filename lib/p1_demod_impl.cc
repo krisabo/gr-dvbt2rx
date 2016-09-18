@@ -88,7 +88,9 @@ namespace gr {
     	const gr_complex *in_data = (const gr_complex *) input_items[2];
     	gr_complex *out = (gr_complex *) output_items[0];
 
+
     	memcpy(out, in_data, noutput_items*sizeof(gr_complex));
+
 
     	for(int i=0; i<noutput_items; i++){
     		if(in_sync[i]){
@@ -98,19 +100,13 @@ namespace gr {
     			gr_complex phase_inc = std::polar(1.0F, -1.0F/fft_len*ffo);
     			volk_32fc_s32fc_rotatorpuppet_32fc(d_in_fftw, in_data+i, phase_inc, fft_len);
 
-//    	    	for(int j=0; j<fft_len; j++)
-//    	    		printf("freq[%i] = %f+j%f\n", j, std::real(*(d_in_fftw+j)),std::imag(*(d_in_fftw+j)));
-
     			//to freq domain
     			fftwf_execute(d_fftw_plan);
 
-//    	    	for(int i=0; i<fft_len; i++)
-//    	    		printf("freq[%i] = %f\n", i, *(d_vec_tmp1+i));
+    			int ifo;
+    			cds_correlation(&ifo, d_out_fftw);
 
-    			int cfo;
-    			cds_correlation(&cfo, d_out_fftw);
-
-    			printf("fo = cfo(%i) + ffo(%f) = %f\n", cfo, ffo/3.141/2, cfo+ffo);
+    			printf("cfo = ifo(%i) + ffo(%f) = %f\n", ifo, ffo/3.141/2, ifo+ffo);
 
     			//s=demod(in_data+i, ffo)
 
@@ -127,46 +123,52 @@ namespace gr {
      * Estimates the position of the correlation peak. Correlation is done with the energy
      * distribution of the carriers and the energy/abs of the p1 in freq domain.
      *
-     * This is a estimation of the carrier freq offset.
+     * This is also an estimation of the carrier integer frequency offset.
      *
-     * returns true if a peak was found
+     * Returns true if a peak was found, false if the p1 signal is not detected
      */
-    bool p1_demod_impl::cds_correlation(int* cfo, const gr_complex* p1_freq_domain){
+    bool p1_demod_impl::cds_correlation(int* ifo, const gr_complex* p1_freq_domain){
+
+
 
     	// energy in rx symbol
     	// d_vec_tmp1 = abs(p1_freq_domain)^2
     	volk_32fc_magnitude_squared_32f(d_vec_tmp1_f, p1_freq_domain, fft_len);
 
-    	// Algorithm to punish when there is energy at frequency where it shouldnt
-    	//	and to delete very high CW interferer (see implementation guide)
+    	// fftshift
+    	// d_vec_tmp0 = [d_vec_tmp1[512:1023], d_vec_tmp1[0:511]]
+    	memcpy(d_vec_tmp0_f, d_vec_tmp1_f+fft_len/2, fft_len/2 * sizeof(d_vec_tmp0_f[0]));
+    	memcpy(d_vec_tmp0_f+fft_len/2, d_vec_tmp1_f, fft_len/2 * sizeof(d_vec_tmp0_f[0]));
+
+    	// Algorithm: punish when there is energy at frequencies where it shouldnt
+    	// and delete high CW interferer (see implementation guide)
 		// 1. calculate mean and stddev
-		// 2. look for values above mean + 4*stddev, TODO: value=4?
+		// 2. look for values above mean + 3*stddev, TODO: value=3?
 		// 3. clip these values
 		// 4. calculate new mean
 		// 5. subtract that mean
 
     	float mean = 0;
     	float stddev = 0;
-    	volk_32f_stddev_and_mean_32f_x2(&stddev, &mean, d_vec_tmp1_f, fft_len);
+
+    	volk_32f_stddev_and_mean_32f_x2(&stddev, &mean, d_vec_tmp0_f, fft_len);
+    	//printf("mean = %f, stddev = %f\n", mean, stddev);
     	for(int i=0; i<fft_len; i++){
-    		if(d_vec_tmp1_f[i] > mean + 4 * stddev){
-    			d_vec_tmp1_f[i] = mean + 2 * stddev;
-    			printf("strong interferer detected at freq: %i", i-fft_len/2);
+    		if(d_vec_tmp0_f[i] > mean + 5 * stddev){
+    			d_vec_tmp0_f[i] = mean + 5 * stddev;
+    			//printf("strong interferer detected at freq: %i\n", i-fft_len/2);
     		}
     	}
 
-    	volk_32f_accumulator_s32f(&mean, d_vec_tmp1_f, fft_len);
+    	volk_32f_accumulator_s32f(&mean, d_vec_tmp0_f, fft_len);
     	mean = mean/fft_len;
+
+    	//printf("mean = %f\n", mean);
 		for(int i=0; i<fft_len; i++){
-			d_vec_tmp1_f[i] -= mean;
+			d_vec_tmp0_f[i] -= mean;
 		}
 
     	//printf("mean = %f, stddev = %f\n", mean, stddev);
-
-    	//fftshift
-    	//d_vec_tmp0 = [d_vec_tmp1[512:1023], d_vec_tmp1[0:511]]
-    	memcpy(d_vec_tmp0_f, d_vec_tmp1_f+fft_len/2, fft_len/2 * sizeof(d_vec_tmp0_f[0]));
-    	memcpy(d_vec_tmp0_f+fft_len/2, d_vec_tmp1_f, fft_len/2 * sizeof(d_vec_tmp0_f[0]));
 
     	//d_vec_tmp1 = 0
     	memset(d_vec_tmp1_f, 0, fft_len*sizeof(float));
@@ -181,8 +183,8 @@ namespace gr {
     			if(carrier > 0 && carrier < fft_len)
     				d_vec_tmp1_f[i] += d_vec_tmp0_f[carrier];
     		}
-//		if(i>500 && i<520)
-//			printf("corr[%i] = %f\n", i-fft_len/2, *(d_vec_tmp1_f+i));
+		//if(i>500 && i<520)
+		//	printf("corr[%i] = %f\n", i-fft_len/2, *(d_vec_tmp1_f+i));
     	}
 
     	//detect max peak
@@ -199,18 +201,14 @@ namespace gr {
     	second_max = d_vec_tmp1_f[second_max_index];
 
     	//printf("max_index: %i, secondmax_index: %i\n", max_index, second_max_index);
+    	//printf("max: %f, secondmax: %f\n\n", max, second_max);
+    	//return ifo
+    	*ifo = max_index-fft_len/2;
 
-    	printf("max: %f, secondmax: %f\n", max, second_max);
-
-    	//calculat cfo
-    	*cfo = max_index-fft_len/2;
-
-    	//TODO: value
+    	//TODO: value=2?
     	if(max > 2*second_max){
-    		printf("true\n");
     		return true;
     	}
-		printf("false\n");
     	return false;
     }
 
