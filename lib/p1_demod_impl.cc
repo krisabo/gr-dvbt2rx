@@ -35,9 +35,7 @@ namespace gr {
         (new p1_demod_impl());
     }
 
-    /*
-     * The private constructor
-     */
+
     p1_demod_impl::p1_demod_impl()
       : gr::sync_block("p1_demod",
               gr::io_signature::make3(3, 3, sizeof(char),sizeof(gr_complex),sizeof(gr_complex)),
@@ -52,8 +50,9 @@ namespace gr {
         d_fftw_plan = fftwf_plan_dft_1d(fft_len, reinterpret_cast<fftwf_complex*>(d_in_fftw),
                 				reinterpret_cast<fftwf_complex*> (d_out_fftw), FFTW_FORWARD, FFTW_ESTIMATE);
 
-        //variable used by volk
+        //variables used by volk
         int alig = volk_get_alignment();
+        d_vec_tmp2_f = (float*) volk_malloc(2 * fft_len * sizeof(float), alig);
         d_vec_tmp1_f = (float*) volk_malloc(2 * fft_len * sizeof(float), alig);
         d_vec_tmp0_f = (float*) volk_malloc(2 * fft_len * sizeof(float), alig);
 
@@ -61,14 +60,13 @@ namespace gr {
 
     }
 
-    /*
-     * Our virtual destructor.
-     */
+
     p1_demod_impl::~p1_demod_impl()
     {
         fftwf_destroy_plan(d_fftw_plan);
         fftwf_free(d_in_fftw);
         fftwf_free(d_out_fftw);
+        volk_free(d_vec_tmp2_f);
         volk_free(d_vec_tmp1_f);
         volk_free(d_vec_tmp0_f);
     }
@@ -96,27 +94,37 @@ namespace gr {
 
     			//to freq domain
     			fftwf_execute(d_fftw_plan);
+    			fftshift(d_in_fftw, d_out_fftw);
+
+    			detect_interferer_and_clip(d_out_fftw, d_vec_tmp2_f, d_in_fftw);
 
     			int ifo;
-    			if(cds_correlation(&ifo, d_out_fftw)){
+    			if(cds_correlation(&ifo, d_vec_tmp2_f)) {
         			correct_ifo(ifo, d_in_fftw, d_out_fftw);
 
         			int s1, s2;
-        			demod(&s1, &s2, d_in_fftw);
+        			if(demod(&s1, &s2, d_in_fftw)){
+        				float cfo = ifo + ffo/M_PI/2;
 
-        			printf("Detected P1 Pilot: cfo = ifo(%i) + ffo(%f) = %f\n", ifo, ffo/3.141/2, ifo+ffo/3.141/2);
-        			add_item_tag(0,nitems_written(0)+i, pmt::mp("p1_start"), pmt::mp("change_me"));
+            			printf("Detected P1 Pilot: cfo = ifo(%i) + ffo(%f) = %f, offset: %lu, s1: %i, s2: %i\n",
+            					ifo, ffo/M_PI/2, cfo, nitems_written(0)+i, s1, s2);
 
+            			// add stream tag
+            			pmt::pmt_t value = pmt::make_dict();
+            			value = pmt::dict_add(value, pmt::mp("cfo"), pmt::from_float(cfo));
+            			value = pmt::dict_add(value, pmt::mp("S1"), pmt::mp(s1));
+            			value = pmt::dict_add(value, pmt::mp("S2"), pmt::mp(s2));
+            			add_item_tag(0,nitems_written(0)+i, pmt::mp("p1_start"), value);
+
+        			}
     			}
-
-    			//s=demod(in_data+i, ffo)
-
-
     		}
     	}
 
       return noutput_items;
     }
+
+
 
     /*
      * Demods the P1 Symbol.
@@ -128,9 +136,8 @@ namespace gr {
      */
     bool p1_demod_impl::demod(int* s1, int* s2, const gr_complex* in){
 
-    	//TODO: use volk for speed opt.
+    	//TODO:? use volk for speed opt.
 
-       	gr_complex symbols_fftshift[fft_len];
     	gr_complex symbols[cnt_act_carriers];
     	gr_complex dbpsk_demod[cnt_act_carriers];
        	float s1_soft_bits [s1_bit_length];
@@ -140,14 +147,10 @@ namespace gr {
        	float s2_corr_results[s2_pattern];
 
 
-    	//fftshift
-    	memcpy(symbols_fftshift, in+fft_len/2, fft_len/2*sizeof(in[0]));
-    	memcpy(symbols_fftshift+fft_len/2, in, fft_len/2*sizeof(in[0]));
-
 
     	//demap
     	for(int i=0; i<cnt_act_carriers; i++){
-    		symbols[i] = symbols_fftshift[p1_active_carriers[i] + 86];
+    		symbols[i] = in[p1_active_carriers[i] + 86];
     	}
 
     	//descramble
@@ -224,8 +227,6 @@ namespace gr {
         	return false;
         }
 
-      	printf("s1: %i, s2: %i \n", *s1, *s2);
-
     	return true;
 
     }
@@ -260,6 +261,25 @@ namespace gr {
     }
 
 
+    /*
+     * Swaps the two halfs of the input vector
+     */
+    void p1_demod_impl::fftshift(gr_complex* out, const gr_complex* in){
+    	memcpy(out, in+fft_len/2, fft_len/2*sizeof(in[0]));
+    	memcpy(out+fft_len/2, in, fft_len/2*sizeof(in[0]));
+
+    }
+
+
+    /*
+     * Swaps the two halfs of the input vector
+     */
+    void p1_demod_impl::fftshift(float* out, const float* in){
+    	memcpy(out, in+fft_len/2, fft_len/2*sizeof(in[0]));
+    	memcpy(out+fft_len/2, in, fft_len/2*sizeof(in[0]));
+
+    }
+
 
     /*
      * copied from gr-dvbt2
@@ -283,6 +303,37 @@ namespace gr {
         }
     }
 
+    /*
+     * Clips very high peaks in the power spectrum and in the corresponding complex vector.
+     *
+     * Returns the clipped complex and magnitude float vectors.
+     */
+    void p1_demod_impl::detect_interferer_and_clip(gr_complex* out_fc, float* out_mag,  const gr_complex* in){
+
+    	memcpy(out_fc, in, fft_len*sizeof(in[0]));
+
+    	float mean = 0;
+    	float stddev = 0;
+
+    	// d_vec_tmp1 = abs(p1_freq_domain)
+    	volk_32fc_magnitude_squared_32f(out_mag, in, fft_len);
+
+    	// TODO: good Algorithm? useful? values?
+    	// 1. calculate mean and stddev
+    	// 2. look for values above mean + 5*stddev
+    	// 3. clip these values
+
+    	volk_32f_stddev_and_mean_32f_x2(&stddev, &mean, out_mag, fft_len);
+
+    	for(int i=0; i<fft_len; i++){
+    		if(out_mag[i] > mean + 5 * stddev){
+    			out_mag[i] = mean + 3 * stddev;
+//    			out_fc[i] = out_fc[i] / std::abs(out_fc[i]) * mean;
+//    			printf("strong interferer detected at freq: %i\n", i-fft_len/2);
+    		}
+    	}
+    }
+
 
     /*
      * Estimates the position of the correlation peak in frequency domain and therefore the IFO.
@@ -291,48 +342,18 @@ namespace gr {
      *
      * Returns true if a peak was found, false if the p1 signal is not detected.
      */
-    bool p1_demod_impl::cds_correlation(int* ifo, const gr_complex* p1_freq_domain){
+    bool p1_demod_impl::cds_correlation(int* ifo, const float* p1_magnitude){
 
-
-
-    	// energy in rx symbol
-    	// d_vec_tmp1 = abs(p1_freq_domain)^2
-    	volk_32fc_magnitude_squared_32f(d_vec_tmp1_f, p1_freq_domain, fft_len);
-
-    	// fftshift
-    	// d_vec_tmp0 = [d_vec_tmp1[512:1023], d_vec_tmp1[0:511]]
-    	memcpy(d_vec_tmp0_f, d_vec_tmp1_f+fft_len/2, fft_len/2 * sizeof(d_vec_tmp0_f[0]));
-    	memcpy(d_vec_tmp0_f+fft_len/2, d_vec_tmp1_f, fft_len/2 * sizeof(d_vec_tmp0_f[0]));
-
-    	// Algorithm: punish when there is energy at frequencies where it shouldnt
-    	// and delete high CW interferer (see implementation guide)
-		// 1. calculate mean and stddev
-		// 2. look for values above mean + 5*stddev, TODO: value=5?
-		// 3. clip these values
-		// 4. calculate new mean
-		// 5. subtract that mean
-
-    	float mean = 0;
-    	float stddev = 0;
-
-    	volk_32f_stddev_and_mean_32f_x2(&stddev, &mean, d_vec_tmp0_f, fft_len);
-    	//printf("mean = %f, stddev = %f\n", mean, stddev);
-    	for(int i=0; i<fft_len; i++){
-    		if(d_vec_tmp0_f[i] > mean + 5 * stddev){
-    			d_vec_tmp0_f[i] = mean + 5 * stddev;
-    			//printf("strong interferer detected at freq: %i\n", i-fft_len/2);
-    		}
-    	}
-
-    	volk_32f_accumulator_s32f(&mean, d_vec_tmp0_f, fft_len);
+    	// punish when there is energy at frequencies where it shouldnt
+    	// therefore subtract the mean
+     	float mean = 0;
+    	volk_32f_accumulator_s32f(&mean, p1_magnitude, fft_len);
     	mean = mean/fft_len;
 
-    	//printf("mean = %f\n", mean);
 		for(int i=0; i<fft_len; i++){
-			d_vec_tmp0_f[i] -= mean;
+			d_vec_tmp0_f[i] = p1_magnitude[i] - mean;
 		}
 
-    	//printf("mean = %f, stddev = %f\n", mean, stddev);
 
     	//d_vec_tmp1 = 0
     	memset(d_vec_tmp1_f, 0, fft_len*sizeof(float));
@@ -347,22 +368,12 @@ namespace gr {
     			if(carrier > 0 && carrier < fft_len)
     				d_vec_tmp1_f[i] += d_vec_tmp0_f[carrier];
     		}
-		//if(i>500 && i<520)
-		//	printf("corr[%i] = %f\n", i-fft_len/2, *(d_vec_tmp1_f+i));
     	}
 
     	//detect max peak
-    	unsigned int max_index;
-    	float max;
-    	volk_32f_index_max_32u(&max_index, d_vec_tmp1_f, fft_len);
-    	max = d_vec_tmp1_f[max_index];
-    	d_vec_tmp1_f[max_index] = -3.4028e+38;
-
-    	//detect second max peak
-    	unsigned int second_max_index;
-    	float second_max;
-    	volk_32f_index_max_32u(&second_max_index, d_vec_tmp1_f, fft_len);
-    	second_max = d_vec_tmp1_f[second_max_index];
+    	int max_index, second_max_index;
+		float max, second_max;
+       	max_and_second_max(&max, &max_index, &second_max, &second_max_index, d_vec_tmp1_f, fft_len);
 
     	//printf("max_index: %i, secondmax_index: %i\n", max_index, second_max_index);
     	//printf("max: %f, secondmax: %f\n\n", max, second_max);
@@ -375,7 +386,6 @@ namespace gr {
     	}
     	return false;
     }
-
 
 
     void p1_demod_impl::correct_ffo(float ffo, gr_complex* out, const gr_complex* in){

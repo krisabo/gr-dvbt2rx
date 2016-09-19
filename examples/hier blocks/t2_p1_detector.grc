@@ -82,49 +82,6 @@
     </param>
   </block>
   <block>
-    <key>blocks_complex_to_arg</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(688, 64)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_complex_to_arg_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
     <key>blocks_complex_to_mag</key>
     <param>
       <key>alias</key>
@@ -144,7 +101,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(504, 176)</value>
+      <value>(536, 144)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -191,7 +148,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(192, 356)</value>
+      <value>(200, 236)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -242,7 +199,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(328, 212)</value>
+      <value>(336, 164)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -301,7 +258,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(656, 156)</value>
+      <value>(760, 124)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -348,7 +305,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(888, 296)</value>
+      <value>(984, 176)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -368,88 +325,6 @@
     </param>
   </block>
   <block>
-    <key>dvbt2rx_sample_to_message</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(880, 64)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>dvbt2rx_sample_to_message_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
-    <key>pad_sink</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(1096, 76)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>pad_sink_1</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>message</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>out_phase</value>
-    </param>
-    <param>
-      <key>num_streams</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>optional</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
     <key>pad_sink</key>
     <param>
       <key>comment</key>
@@ -461,7 +336,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1048, 324)</value>
+      <value>(1112, 204)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -504,7 +379,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(16, 228)</value>
+      <value>(24, 180)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -555,7 +430,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(184, 232)</value>
+      <value>(192, 184)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -575,12 +450,6 @@
     </param>
   </block>
   <connection>
-    <source_block_id>blocks_complex_to_arg_0</source_block_id>
-    <sink_block_id>dvbt2rx_sample_to_message_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>blocks_complex_to_mag_0</source_block_id>
     <sink_block_id>blocks_peak_detector2_fb_0</sink_block_id>
     <source_key>0</source_key>
@@ -591,12 +460,6 @@
     <sink_block_id>dvbt2rx_p1_demod_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>2</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_moving_average_xx_0</source_block_id>
-    <sink_block_id>blocks_complex_to_arg_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>blocks_moving_average_xx_0</source_block_id>
@@ -617,22 +480,10 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>blocks_peak_detector2_fb_0</source_block_id>
-    <sink_block_id>dvbt2rx_sample_to_message_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>1</sink_key>
-  </connection>
-  <connection>
     <source_block_id>dvbt2rx_p1_demod_0</source_block_id>
     <sink_block_id>pad_sink_1_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>dvbt2rx_sample_to_message_0</source_block_id>
-    <sink_block_id>pad_sink_1</sink_block_id>
-    <source_key>msg_sample</source_key>
-    <sink_key>in</sink_key>
   </connection>
   <connection>
     <source_block_id>pad_source_0</source_block_id>

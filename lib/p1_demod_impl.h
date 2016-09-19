@@ -39,12 +39,11 @@ namespace gr {
     	const static int s1_pattern = 8;
     	const static int s2_pattern = 16;
 
-
-
         gr_complex *d_in_fftw;
         gr_complex *d_out_fftw;
         fftwf_plan d_fftw_plan;
 
+        float *d_vec_tmp2_f;
         float *d_vec_tmp1_f;
         float *d_vec_tmp0_f;
 
@@ -57,12 +56,15 @@ namespace gr {
 
         void init_p1_scramble_seq();
 
-        bool cds_correlation(int* ifo,const gr_complex* p1_freq_domain);
+        bool cds_correlation(int* ifo,const float* p1_magnitude);
         bool demod(int* s1, int* s2, const gr_complex* in);
 
         void correct_ffo(float ffo, gr_complex* out, const gr_complex* in);
         void correct_ifo(int ifo, gr_complex* out, const gr_complex* in);
         void max_and_second_max(float* max, int* max_index, float* sec_max, int* sec_max_index, float* arr, int points);
+        void fftshift(gr_complex* out, const gr_complex* in);
+        void fftshift(float* out, const float* in);
+        void detect_interferer_and_clip(gr_complex* out_fc, float* out_mag,  const gr_complex* in);
 
 
      public:
