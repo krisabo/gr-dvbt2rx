@@ -27,12 +27,6 @@
 #include <cmath>
 #include "t2common.h"
 
-#define P1_S1_SISO 			0
-#define P1_S1_MISO 			1
-#define P1_S1_NONT2 		2
-#define P1_S1_LITE_SISO		3
-#define P1_S1_LITE_MISO 	4
-
 namespace gr {
   namespace dvbt2rx {
 

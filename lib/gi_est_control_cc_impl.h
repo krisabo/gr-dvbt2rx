@@ -22,6 +22,7 @@
 #define INCLUDED_DVBT2RX_GI_EST_CONTROL_CC_IMPL_H
 
 #include <dvbt2rx/gi_est_control_cc.h>
+#include "t2common.h"
 
 namespace gr {
   namespace dvbt2rx {
@@ -30,18 +31,25 @@ namespace gr {
     {
      private:
         int d_s2 = -1;
-        bool d_recv_p1;
+        bool d_recv_p1 = false;
         int d_fft_size = -1;
+        bool d_finished = false;
+
+        boost::shared_ptr<gr::blocks::delay> d_delay;
+        boost::shared_ptr<gr::blocks::peak_detector2_fb> d_peak;
+        boost::shared_ptr<gr::blocks::moving_average_cc> d_moving_avg;
+        boost::shared_ptr<gi_est_decider_b> d_gi_decider;
 
      public:
       gi_est_control_cc_impl(boost::shared_ptr<gr::blocks::delay> delay,
-                             boost::shared_ptr<gr::blocks::peak_detector2_fb> peak,
                              boost::shared_ptr<gr::blocks::moving_average_cc> moving_avg,
                              boost::shared_ptr<gi_est_decider_b> gi_decider);
       ~gi_est_control_cc_impl();
 
+        void forecast (int noutput_items, gr_vector_int &ninput_items_required)  ;
+
       // Where all the action really happens
-      int work(int noutput_items,
+      int general_work(int noutput_items,
          gr_vector_const_void_star &input_items,
          gr_vector_void_star &output_items);
     };

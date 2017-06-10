@@ -24,11 +24,11 @@ namespace gr {
             static constexpr int p1_s2_1_t2base_fft_size[8] = {2048, 8192, 4096, 1024, 16384, 32768, 8192, 32768};
             static constexpr int p1_s2_1_t2lite_fft_size[8] = {2048, 8192, 4096, 16384, 16384, 0, 8192, 0};
 
-             const std::vector< std::vector <int > > p1_s2_1_t2base_valid_gi = {
-                    {1,2,3},
-                    {4,5,4},
-                    {6,7,0},
-            };
+//             const std::vector< std::vector <int > > p1_s2_1_t2base_valid_gi = {
+//                    {1,2,3},
+//                    {4,5,4},
+//                    {6,7,0},
+//            };
 
 
             static constexpr int p1_active_carriers[384] =

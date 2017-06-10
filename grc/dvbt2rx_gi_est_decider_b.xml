@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <block>
-  <name>gi_est_decider_b</name>
+  <name>GI Estimation</name>
   <key>dvbt2rx_gi_est_decider_b</key>
   <category>[dvbt2rx]</category>
   <import>import dvbt2rx</import>
@@ -8,7 +8,12 @@
 
   <sink>
     <name>in</name>
-    <type>byte</type>
+    <type>float</type>
+  </sink>
+
+  <sink>
+    <name>in_power</name>
+    <type>float</type>
   </sink>
 
 

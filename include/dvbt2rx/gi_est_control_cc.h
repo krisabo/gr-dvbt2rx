@@ -38,7 +38,7 @@ namespace gr {
      * \ingroup dvbt2rx
      *
      */
-    class DVBT2RX_API gi_est_control_cc : virtual public gr::sync_block
+    class DVBT2RX_API gi_est_control_cc : virtual public gr::block
     {
      public:
       typedef boost::shared_ptr<gi_est_control_cc> sptr;
@@ -52,7 +52,6 @@ namespace gr {
        * creating new instances.
        */
       static sptr make(boost::shared_ptr<gr::blocks::delay> delay,
-                       boost::shared_ptr<gr::blocks::peak_detector2_fb> peak,
                        boost::shared_ptr<gr::blocks::moving_average_cc> moving_avg,
                        boost::shared_ptr<gi_est_decider_b> gi_decider);
     };

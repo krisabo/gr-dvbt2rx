@@ -19,5 +19,6 @@
 install(FILES
     dvbt2rx_p1_demod.xml
     dvbt2rx_gi_est_control_cc.xml
-    dvbt2rx_gi_est_decider_b.xml DESTINATION share/gnuradio/grc/blocks
+    dvbt2rx_gi_est_decider_b.xml
+    DESTINATION share/gnuradio/grc/blocks
 )

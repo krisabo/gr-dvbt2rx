@@ -11,7 +11,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ * peak
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street,
@@ -40,7 +40,7 @@ namespace gr {
      */
     gi_est_decider_b_impl::gi_est_decider_b_impl()
       : gr::sync_block("gi_est_decider_b",
-              gr::io_signature::make(1, 1, sizeof(unsigned char)),
+              gr::io_signature::make(2, 2, sizeof(gr_complex)),
               gr::io_signature::make(0, 0, 0))
     {
         message_port_register_out(pmt::mp("gi_est"));
