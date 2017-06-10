@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<block>
+  <name>gi_est_control_cc</name>
+  <key>dvbt2rx_gi_est_control_cc</key>
+  <category>[dvbt2rx]</category>
+  <import>import dvbt2rx</import>
+  <make>dvbt2rx.gi_est_control_cc(self.$(delay()), self.$(peak()), self.$(moving_sum()), self.$(gi_decider()))</make>
+
+  <param>
+    <name>Delay Block</name>
+    <key>delay</key>
+    <type>raw</type>
+  </param>
+
+  <param>
+    <name>Peak Detect Block</name>
+    <key>peak</key>
+    <type>raw</type>
+  </param>
+
+  <param>
+    <name>Moving Sum Block</name>
+    <key>moving_sum</key>
+    <type>raw</type>
+  </param>
+
+  <param>
+    <name>GI decider</name>
+    <key>gi_decider</key>
+    <type>raw</type>
+  </param>
+
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+
+  <source>
+    <name>out</name>
+    <type>complex</type>
+  </source>
+</block>

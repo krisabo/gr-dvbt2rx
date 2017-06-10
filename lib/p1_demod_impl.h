@@ -25,6 +25,13 @@
 #include <volk/volk.h>
 #include <fftw3.h>
 #include <cmath>
+#include "t2common.h"
+
+#define P1_S1_SISO 			0
+#define P1_S1_MISO 			1
+#define P1_S1_NONT2 		2
+#define P1_S1_LITE_SISO		3
+#define P1_S1_LITE_MISO 	4
 
 namespace gr {
   namespace dvbt2rx {
@@ -48,11 +55,6 @@ namespace gr {
         float *d_vec_tmp0_f;
 
         int p1_scramble_seq[384];
-
-        const static int p1_active_carriers[384];
-        const static unsigned char s1_modulation_patterns[8][8];
-        const static unsigned char s2_modulation_patterns[16][32];
-
 
         void init_p1_scramble_seq();
 

@@ -22,5 +22,7 @@
 ########################################################################
 install(FILES
     api.h
-    p1_demod.h DESTINATION include/dvbt2rx
+    p1_demod.h
+    gi_est_control_cc.h
+    gi_est_decider_b.h DESTINATION include/dvbt2rx
 )

@@ -24,6 +24,9 @@ cmake_minimum_required(VERSION 2.6)
 project(gr-dvbt2rx CXX C)
 enable_testing()
 
+set (CMAKE_CXX_STANDARD 14)
+
+
 #install to PyBOMBS target prefix if defined
 if(DEFINED ENV{PYBOMBS_PREFIX})
     set(CMAKE_INSTALL_PREFIX $ENV{PYBOMBS_PREFIX})

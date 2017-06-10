@@ -25,9 +25,11 @@ include(GrPlatform) #define LIB_SUFFIX
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND dvbt2rx_sources
-    p1_demod_impl.cc )
+    p1_demod_impl.cc
+    gi_est_control_cc_impl.cc
+    gi_est_decider_b_impl.cc )
 
-set(dvbt2rx_sources "${dvbt2rx_sources}" PARENT_SCOPE)
+set(dvbt2rx_sources "${dvbt2rx_sources}" PARENT_SCOPE )
 if(NOT dvbt2rx_sources)
 	MESSAGE(STATUS "No C++ sources... skipping lib/")
 	return()
