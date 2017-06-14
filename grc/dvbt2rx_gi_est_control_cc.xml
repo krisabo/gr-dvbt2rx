@@ -1,45 +1,45 @@
 <?xml version="1.0"?>
 <block>
-  <name>GI Estimation Control</name>
+  <name>DVBT2RX GI Estimation Control</name>
   <key>dvbt2rx_gi_est_control_cc</key>
   <category>[dvbt2rx]</category>
   <import>import dvbt2rx</import>
   <make>dvbt2rx.gi_est_control_cc(self.$(delay()), self.$(moving_sum()))</make>
 
-  <param>
-    <name>Delay Block</name>
-    <key>delay</key>
-    <type>raw</type>
-  </param>
+<param>
+  <name>Delay Block</name>
+  <key>delay</key>
+  <type>raw</type>
+</param>
 
-  <param>
-    <name>Moving Sum Block</name>
-    <key>moving_sum</key>
-    <type>raw</type>
-  </param>
+<param>
+  <name>Moving Sum Block</name>
+  <key>moving_sum</key>
+  <type>raw</type>
+</param>
 
-  <sink>
-    <name>in</name>
-    <type>complex</type>
-  </sink>
+<sink>
+  <name>in</name>
+  <type>complex</type>
+</sink>
 
 
-  <sink>
-    <name>cfg_in</name>
-    <type>message</type>
-    <optional>1</optional>
-  </sink>
+<sink>
+  <name>cfg_in</name>
+  <type>message</type>
+  <optional>1</optional>
+</sink>
 
-  <source>
-    <name>out</name>
-    <type>complex</type>
-  </source>
+<source>
+  <name>out</name>
+  <type>complex</type>
+</source>
 
-  <source>
-    <name>cfg_out</name>
-    <type>message</type>
-    <optional>1</optional>
-  </source>
+<source>
+  <name>cfg_out</name>
+  <type>message</type>
+  <optional>1</optional>
+</source>
 
 
 

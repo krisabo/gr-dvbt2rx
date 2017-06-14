@@ -78,7 +78,7 @@
     </param>
     <param>
       <key>title</key>
-      <value>P1 detector</value>
+      <value>DVBT2RX hier P1 Detector</value>
     </param>
   </block>
   <block>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <block>
-  <name>P1 Demodulation</name>
+  <name>DVBT2RX P1 Demodulation</name>
   <key>dvbt2rx_p1_demod</key>
   <category>[dvbt2rx]</category>
   <import>import dvbt2rx</import>

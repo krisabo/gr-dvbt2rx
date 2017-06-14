@@ -46,7 +46,7 @@ namespace gr {
        * class. dvbt2rx::gi_est_decider::make is the public interface for
        * creating new instances.
        */
-      static sptr make();
+      static sptr make(float thresh_factor, int avg_syms);
     };
 
   } // namespace dvbt2rx

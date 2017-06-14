@@ -29,21 +29,25 @@ namespace gr {
   namespace dvbt2rx {
 
     gi_est_decider::sptr
-    gi_est_decider::make()
+    gi_est_decider::make(float thresh_factor, int avg_syms)
     {
       return gnuradio::get_initial_sptr
-        (new gi_est_decider_impl());
+        (new gi_est_decider_impl(thresh_factor, avg_syms));
     }
 
     /*
      * The private constructor
      */
-    gi_est_decider_impl::gi_est_decider_impl()
+    gi_est_decider_impl::gi_est_decider_impl(float thresh_factor, int avg_syms)
       : gr::sync_block("gi_est_decider",
               gr::io_signature::make(2, 2, sizeof(float)),
               gr::io_signature::make(0, 0, 0))
     {
         message_port_register_out(pmt::mp("gi_est"));
+
+        message_port_register_in(pmt::mp("cfg_in"));
+        set_msg_handler(pmt::mp("cfg_in"), boost::bind(&gi_est_decider_impl::msg_cfg_in, this, _1));
+        message_port_register_in(pmt::mp("cfg_out"));
     }
 
     /*
@@ -53,7 +57,13 @@ namespace gr {
     {
     }
 
-    int
+      void
+      gi_est_decider_impl::msg_cfg_in(pmt::pmt_t msg){
+
+      }
+
+
+      int
     gi_est_decider_impl::work(int noutput_items,
         gr_vector_const_void_star &input_items,
         gr_vector_void_star &output_items)

@@ -25,7 +25,7 @@
 #include <volk/volk.h>
 #include <fftw3.h>
 #include <cmath>
-#include <dvbt2rx/t2common.h>
+//#include <dvbt2rx/t2common.h>
 
 namespace gr {
   namespace dvbt2rx {
@@ -39,6 +39,10 @@ namespace gr {
     	const static int s2_bit_length = 256;
     	const static int s1_pattern = 8;
     	const static int s2_pattern = 16;
+
+		static const int p1_active_carriers[384];
+		static const unsigned char s1_modulation_patterns[8][8];
+		static const unsigned char s2_modulation_patterns[16][32];
 
         gr_complex *d_in_fftw;
         gr_complex *d_out_fftw;

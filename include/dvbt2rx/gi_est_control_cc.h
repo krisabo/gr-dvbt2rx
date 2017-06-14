@@ -23,11 +23,10 @@
 #define INCLUDED_DVBT2RX_GI_EST_CONTROL_CC_H
 
 #include <dvbt2rx/api.h>
-#include <gnuradio/sync_block.h>
+#include <gnuradio/block.h>
 
 #include <gnuradio/blocks/delay.h>
 #include <gnuradio/blocks/moving_average_cc.h>
-#include <gnuradio/blocks/peak_detector2_fb.h>
 
 namespace gr {
   namespace dvbt2rx {

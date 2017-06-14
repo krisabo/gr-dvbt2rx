@@ -30,13 +30,41 @@ namespace gr {
     class gi_est_control_cc_impl : public gi_est_control_cc
     {
      private:
+
+        typedef enum{
+            T2BASE_SISO = 0,
+            T2BASE_MISO = 1,
+            NONT2       = 2,
+            T2LITE_SISO = 3,
+            T2LITE_MISO = 4,
+            resvd0      = 5,
+            resvd1      = 6,
+            resvd2      = 7,
+        }p1_s1;
+
+
         int d_s2;
-        bool d_recv_p1;
+        int d_s1;
+        int d_s2_1;
         int d_fftlen;
+        int d_corr_window;
+
+        bool d_busy;
         bool d_finished;
+
+        static const int p1_s2_1_t2base_fft_size[8];
+        static const int p1_s2_1_t2lite_fft_size[8];
+        static const int p1_s2_1_t2base_cp_corr_window[8];
+        static const int p1_s2_1_t2lite_cp_corr_window[8];
+
+        static const int p1_s2_1_t2base_valid_gi[8][7];
+        static const int p1_s2_1_t2lite_valid_gi[8][7];
 
         boost::shared_ptr<gr::blocks::delay> d_delay;
         boost::shared_ptr<gr::blocks::moving_average_cc> d_moving_avg;
+
+        void msg_cfg_in(pmt::pmt_t msg);
+
 
      public:
       gi_est_control_cc_impl(boost::shared_ptr<gr::blocks::delay> delay,
@@ -47,8 +75,9 @@ namespace gr {
 
       // Where all the action really happens
       int general_work(int noutput_items,
-         gr_vector_const_void_star &input_items,
-         gr_vector_void_star &output_items);
+                       gr_vector_int &ninput_items,
+                       gr_vector_const_void_star &input_items,
+                       gr_vector_void_star &output_items);
     };
 
   } // namespace dvbt2rx

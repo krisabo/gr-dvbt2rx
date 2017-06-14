@@ -29,10 +29,12 @@ namespace gr {
     class gi_est_decider_impl : public gi_est_decider
     {
      private:
-      // Nothing to declare in this block.
+        // Nothing to declare in this block.
+
+        void msg_cfg_in(pmt::pmt_t msg);
 
      public:
-      gi_est_decider_impl();
+      gi_est_decider_impl(float thresh_factor, int avg_syms);
       ~gi_est_decider_impl();
 
       // Where all the action really happens

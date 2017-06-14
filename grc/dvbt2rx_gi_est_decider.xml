@@ -1,10 +1,24 @@
 <?xml version="1.0"?>
 <block>
-  <name>GI Estimation Decider</name>
+  <name>DVBT2RX GI Estimation Decider</name>
   <key>dvbt2rx_gi_est_decider</key>
   <category>[dvbt2rx]</category>
   <import>import dvbt2rx</import>
-  <make>dvbt2rx.gi_est_decider()</make>
+  <make>dvbt2rx.gi_est_decider($thresh_factor, $avg_syms)</make>
+
+
+  <param>
+    <name>Threshold Factor</name>
+    <key>thresh_factor</key>
+    <type>float</type>
+  </param>
+
+
+  <param>
+    <name>Averaged Symbols</name>
+    <key>avg_syms</key>
+    <type>int</type>
+  </param>
 
   <sink>
     <name>in</name>
