@@ -4,7 +4,7 @@
   <key>dvbt2rx_gi_est_control_cc</key>
   <category>[dvbt2rx]</category>
   <import>import dvbt2rx</import>
-  <make>dvbt2rx.gi_est_control_cc(self.$(delay()), self.$(moving_sum()), self.$(gi_decider()))</make>
+  <make>dvbt2rx.gi_est_control_cc(self.$(delay()), self.$(moving_sum()))</make>
 
   <param>
     <name>Delay Block</name>
@@ -18,19 +18,29 @@
     <type>raw</type>
   </param>
 
-  <param>
-    <name>GI decider</name>
-    <key>gi_decider</key>
-    <type>raw</type>
-  </param>
-
   <sink>
     <name>in</name>
     <type>complex</type>
+  </sink>
+
+
+  <sink>
+    <name>cfg_in</name>
+    <type>message</type>
+    <optional>1</optional>
   </sink>
 
   <source>
     <name>out</name>
     <type>complex</type>
   </source>
+
+  <source>
+    <name>cfg_out</name>
+    <type>message</type>
+    <optional>1</optional>
+  </source>
+
+
+
 </block>

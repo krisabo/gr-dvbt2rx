@@ -23,24 +23,24 @@
 #endif
 
 #include <gnuradio/io_signature.h>
-#include "gi_est_decider_b_impl.h"
+#include "gi_est_decider_impl.h"
 
 namespace gr {
   namespace dvbt2rx {
 
-    gi_est_decider_b::sptr
-    gi_est_decider_b::make()
+    gi_est_decider::sptr
+    gi_est_decider::make()
     {
       return gnuradio::get_initial_sptr
-        (new gi_est_decider_b_impl());
+        (new gi_est_decider_impl());
     }
 
     /*
      * The private constructor
      */
-    gi_est_decider_b_impl::gi_est_decider_b_impl()
-      : gr::sync_block("gi_est_decider_b",
-              gr::io_signature::make(2, 2, sizeof(gr_complex)),
+    gi_est_decider_impl::gi_est_decider_impl()
+      : gr::sync_block("gi_est_decider",
+              gr::io_signature::make(2, 2, sizeof(float)),
               gr::io_signature::make(0, 0, 0))
     {
         message_port_register_out(pmt::mp("gi_est"));
@@ -49,16 +49,17 @@ namespace gr {
     /*
      * Our virtual destructor.
      */
-    gi_est_decider_b_impl::~gi_est_decider_b_impl()
+    gi_est_decider_impl::~gi_est_decider_impl()
     {
     }
 
     int
-    gi_est_decider_b_impl::work(int noutput_items,
+    gi_est_decider_impl::work(int noutput_items,
         gr_vector_const_void_star &input_items,
         gr_vector_void_star &output_items)
     {
-      const unsigned char *in = (const unsigned char *) input_items[0];
+        const float *in = (const float *) input_items[0];
+        const float *in_power = (const float *) input_items[1];
 
       // Do <+signal processing+>
 

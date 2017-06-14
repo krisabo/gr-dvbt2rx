@@ -18,39 +18,31 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#ifndef INCLUDED_DVBT2RX_GI_EST_DECIDER_IMPL_H
+#define INCLUDED_DVBT2RX_GI_EST_DECIDER_IMPL_H
 
-#ifndef INCLUDED_DVBT2RX_GI_EST_DECIDER_B_H
-#define INCLUDED_DVBT2RX_GI_EST_DECIDER_B_H
-
-#include <dvbt2rx/api.h>
-#include <gnuradio/sync_block.h>
+#include <dvbt2rx/gi_est_decider.h>
 
 namespace gr {
   namespace dvbt2rx {
 
-    /*!
-     * \brief <+description of block+>
-     * \ingroup dvbt2rx
-     *
-     */
-    class DVBT2RX_API gi_est_decider_b : virtual public gr::sync_block
+    class gi_est_decider_impl : public gi_est_decider
     {
-     public:
-      typedef boost::shared_ptr<gi_est_decider_b> sptr;
+     private:
+      // Nothing to declare in this block.
 
-      /*!
-       * \brief Return a shared_ptr to a new instance of dvbt2rx::gi_est_decider_b.
-       *
-       * To avoid accidental use of raw pointers, dvbt2rx::gi_est_decider_b's
-       * constructor is in a private implementation
-       * class. dvbt2rx::gi_est_decider_b::make is the public interface for
-       * creating new instances.
-       */
-      static sptr make();
+     public:
+      gi_est_decider_impl();
+      ~gi_est_decider_impl();
+
+      // Where all the action really happens
+      int work(int noutput_items,
+         gr_vector_const_void_star &input_items,
+         gr_vector_void_star &output_items);
     };
 
   } // namespace dvbt2rx
 } // namespace gr
 
-#endif /* INCLUDED_DVBT2RX_GI_EST_DECIDER_B_H */
+#endif /* INCLUDED_DVBT2RX_GI_EST_DECIDER_IMPL_H */
 

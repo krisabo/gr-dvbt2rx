@@ -36,14 +36,11 @@ namespace gr {
         bool d_finished = false;
 
         boost::shared_ptr<gr::blocks::delay> d_delay;
-        boost::shared_ptr<gr::blocks::peak_detector2_fb> d_peak;
         boost::shared_ptr<gr::blocks::moving_average_cc> d_moving_avg;
-        boost::shared_ptr<gi_est_decider_b> d_gi_decider;
 
      public:
       gi_est_control_cc_impl(boost::shared_ptr<gr::blocks::delay> delay,
-                             boost::shared_ptr<gr::blocks::moving_average_cc> moving_avg,
-                             boost::shared_ptr<gi_est_decider_b> gi_decider);
+                             boost::shared_ptr<gr::blocks::moving_average_cc> moving_avg);
       ~gi_est_control_cc_impl();
 
         void forecast (int noutput_items, gr_vector_int &ninput_items_required)  ;

@@ -27,7 +27,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 list(APPEND dvbt2rx_sources
     p1_demod_impl.cc
     gi_est_control_cc_impl.cc
-    gi_est_decider_b_impl.cc
+    gi_est_decider_impl.cc
     )
 
 set(dvbt2rx_sources "${dvbt2rx_sources}" PARENT_SCOPE )

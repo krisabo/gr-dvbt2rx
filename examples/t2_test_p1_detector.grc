@@ -297,11 +297,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1688, 728)</value>
+      <value>(2008, 552)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -340,11 +340,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1088, 1064)</value>
+      <value>(1024, 1064)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -387,11 +387,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1288, 516)</value>
+      <value>(1400, 596)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -399,7 +399,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>blocks_delay_0</value>
+      <value>blocks_delay</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -493,11 +493,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1632, 472)</value>
+      <value>(1816, 528)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -505,7 +505,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>blocks_moving_average_0</value>
+      <value>blocks_moving_average</value>
     </param>
     <param>
       <key>length</key>
@@ -548,7 +548,7 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -564,7 +564,7 @@
     </param>
     <param>
       <key>length</key>
-      <value>2**15</value>
+      <value>2**10</value>
     </param>
     <param>
       <key>max_iter</key>
@@ -580,7 +580,7 @@
     </param>
     <param>
       <key>scale</key>
-      <value>1./2**15/2**15*2</value>
+      <value>1./2**10/2**10</value>
     </param>
     <param>
       <key>type</key>
@@ -603,11 +603,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1424, 500)</value>
+      <value>(1576, 548)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -616,57 +616,6 @@
     <param>
       <key>id</key>
       <value>blocks_multiply_conjugate_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_multiply_const_vxx</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>const</key>
-      <value>10</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(1832, 1068)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_multiply_const_vxx_0</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>float</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -733,206 +682,6 @@
     </param>
   </block>
   <block>
-    <key>blocks_null_sink</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>bus_conns</key>
-      <value>[[0,],]</value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(1936, 888)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_null_sink_0</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>num_inputs</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_peak_detector2_fb</key>
-    <param>
-      <key>alpha</key>
-      <value>0.0001</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(2064, 528)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_peak_detector2</value>
-    </param>
-    <param>
-      <key>look_ahead</key>
-      <value>10000</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>100000</value>
-    </param>
-    <param>
-      <key>threshold_factor_rise</key>
-      <value>2</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_peak_detector2_fb</key>
-    <param>
-      <key>alpha</key>
-      <value>0.0001</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(2056, 1032)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_peak_detector2_0</value>
-    </param>
-    <param>
-      <key>look_ahead</key>
-      <value>10000</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>threshold_factor_rise</key>
-      <value>2</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_tag_gate</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(2488, 736)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_tag_gate_1</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>float</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>propagate_tags</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
     <key>blocks_throttle</key>
     <param>
       <key>alias</key>
@@ -988,45 +737,6 @@
     </param>
   </block>
   <block>
-    <key>blocks_uchar_to_float</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(2136, 856)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_uchar_to_float_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-  </block>
-  <block>
     <key>dvbt2rx_gi_est_control_cc</key>
     <param>
       <key>alias</key>
@@ -1046,15 +756,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>gi_decider</key>
-      <value>"dvbt2rx_gi_est_decider"</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(984, 448)</value>
+      <value>(992, 540)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1078,7 +784,7 @@
     </param>
   </block>
   <block>
-    <key>gi_estimation</key>
+    <key>dvbt2rx_gi_est_decider_b</key>
     <param>
       <key>alias</key>
       <value></value>
@@ -1093,11 +799,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>True</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(776, 568)</value>
+      <value>(1792, 1188)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1105,7 +811,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>gi_estimation_0</value>
+      <value>dvbt2rx_gi_est_decider_b_0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1610,11 +1316,11 @@
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(2568, 1080)</value>
+      <value>(2256, 1008)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1994,6 +1700,12 @@
   </connection>
   <connection>
     <source_block_id>blocks_complex_to_mag_squared_1</source_block_id>
+    <sink_block_id>dvbt2rx_gi_est_decider_b_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>blocks_complex_to_mag_squared_1</source_block_id>
     <sink_block_id>qtgui_time_sink_x_0_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
@@ -2005,7 +1717,7 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>blocks_delay_0</source_block_id>
+    <source_block_id>blocks_delay</source_block_id>
     <sink_block_id>blocks_multiply_conjugate_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>1</sink_key>
@@ -2017,10 +1729,16 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>blocks_moving_average_0</source_block_id>
+    <source_block_id>blocks_moving_average</source_block_id>
     <sink_block_id>blocks_complex_to_mag_squared_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>blocks_moving_average_1</source_block_id>
+    <sink_block_id>dvbt2rx_gi_est_decider_b_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>1</sink_key>
   </connection>
   <connection>
     <source_block_id>blocks_moving_average_1</source_block_id>
@@ -2030,31 +1748,13 @@
   </connection>
   <connection>
     <source_block_id>blocks_multiply_conjugate_0</source_block_id>
-    <sink_block_id>blocks_moving_average_0</sink_block_id>
+    <sink_block_id>blocks_moving_average</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_multiply_const_vxx_0</source_block_id>
-    <sink_block_id>qtgui_time_sink_x_0_0_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>1</sink_key>
   </connection>
   <connection>
     <source_block_id>blocks_multiply_xx_0</source_block_id>
     <sink_block_id>blocks_throttle_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_peak_detector2</source_block_id>
-    <sink_block_id>blocks_null_sink_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_peak_detector2_0</source_block_id>
-    <sink_block_id>blocks_uchar_to_float_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -2065,14 +1765,8 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>blocks_uchar_to_float_0</source_block_id>
-    <sink_block_id>blocks_tag_gate_1</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>dvbt2rx_gi_est_control_cc_0</source_block_id>
-    <sink_block_id>blocks_delay_0</sink_block_id>
+    <sink_block_id>blocks_delay</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -2091,12 +1785,6 @@
   <connection>
     <source_block_id>t2_p1_detector_0</source_block_id>
     <sink_block_id>dvbt2rx_gi_est_control_cc_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>t2_p1_detector_0</source_block_id>
-    <sink_block_id>gi_estimation_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>

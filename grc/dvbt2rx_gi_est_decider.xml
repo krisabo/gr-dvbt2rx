@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <block>
-  <name>GI Estimation</name>
-  <key>dvbt2rx_gi_est_decider_b</key>
+  <name>GI Estimation Decider</name>
+  <key>dvbt2rx_gi_est_decider</key>
   <category>[dvbt2rx]</category>
   <import>import dvbt2rx</import>
-  <make>dvbt2rx.gi_est_decider_b()</make>
+  <make>dvbt2rx.gi_est_decider()</make>
 
   <sink>
     <name>in</name>
@@ -16,9 +16,21 @@
     <type>float</type>
   </sink>
 
+  <sink>
+    <name>cfg_in</name>
+    <type>message</type>
+    <optional>1</optional>
+  </sink>
+
 
   <source>
     <name>gi_est</name>
+    <type>message</type>
+    <optional>1</optional>
+  </source>
+
+  <source>
+    <name>cfg_out</name>
     <type>message</type>
     <optional>1</optional>
   </source>

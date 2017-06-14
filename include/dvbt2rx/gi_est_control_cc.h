@@ -28,7 +28,6 @@
 #include <gnuradio/blocks/delay.h>
 #include <gnuradio/blocks/moving_average_cc.h>
 #include <gnuradio/blocks/peak_detector2_fb.h>
-#include "gi_est_decider_b.h"
 
 namespace gr {
   namespace dvbt2rx {
@@ -52,8 +51,7 @@ namespace gr {
        * creating new instances.
        */
       static sptr make(boost::shared_ptr<gr::blocks::delay> delay,
-                       boost::shared_ptr<gr::blocks::moving_average_cc> moving_avg,
-                       boost::shared_ptr<gi_est_decider_b> gi_decider);
+                       boost::shared_ptr<gr::blocks::moving_average_cc> moving_avg);
     };
 
   } // namespace dvbt2rx

@@ -23,7 +23,7 @@ from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import dvbt2rx_swig as dvbt2rx
 
-class qa_gi_est_decider_b (gr_unittest.TestCase):
+class qa_gi_est_decider (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
@@ -38,4 +38,4 @@ class qa_gi_est_decider_b (gr_unittest.TestCase):
 
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_gi_est_decider_b, "qa_gi_est_decider_b.xml")
+    gr_unittest.run(qa_gi_est_decider, "qa_gi_est_decider.xml")
