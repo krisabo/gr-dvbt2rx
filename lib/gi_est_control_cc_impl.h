@@ -22,7 +22,7 @@
 #define INCLUDED_DVBT2RX_GI_EST_CONTROL_CC_IMPL_H
 
 #include <dvbt2rx/gi_est_control_cc.h>
-#include "t2common.h"
+#include <dvbt2rx/t2common.h>
 
 namespace gr {
   namespace dvbt2rx {
@@ -30,10 +30,10 @@ namespace gr {
     class gi_est_control_cc_impl : public gi_est_control_cc
     {
      private:
-        int d_s2 = -1;
-        bool d_recv_p1 = false;
-        int d_fft_size = -1;
-        bool d_finished = false;
+        int d_s2;
+        bool d_recv_p1;
+        int d_fftlen;
+        bool d_finished;
 
         boost::shared_ptr<gr::blocks::delay> d_delay;
         boost::shared_ptr<gr::blocks::moving_average_cc> d_moving_avg;

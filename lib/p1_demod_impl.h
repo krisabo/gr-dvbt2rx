@@ -25,7 +25,7 @@
 #include <volk/volk.h>
 #include <fftw3.h>
 #include <cmath>
-#include "t2common.h"
+#include <dvbt2rx/t2common.h>
 
 namespace gr {
   namespace dvbt2rx {

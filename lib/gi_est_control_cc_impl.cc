@@ -47,7 +47,10 @@ namespace gr {
                   //d_delay(delay),
                  // d_moving_avg(moving_avg)
         {
-
+            d_s2 = -1;
+            d_recv_p1 = false;
+            d_fftlen = -1;
+            d_finished = false;
         }
 
         /*

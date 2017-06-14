@@ -25,5 +25,6 @@ install(FILES
     p1_demod.h
     gi_est_control_cc.h
     gi_est_decider.h
+    t2common.h
     DESTINATION include/dvbt2rx
 )
